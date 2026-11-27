@@ -2,7 +2,7 @@ name: Build Repo
 on:
   push:
     paths:
-      - 'debs/**'
+      - '*.deb'
       - 'Release'
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev bzip2
       - name: Generate Packages
         run: |
-          dpkg-scanpackages -m ./debs > Packages
+          dpkg-scanpackages -m . > Packages
           bzip2 -fks Packages
           gzip -fks Packages
       - name: Commit index files
