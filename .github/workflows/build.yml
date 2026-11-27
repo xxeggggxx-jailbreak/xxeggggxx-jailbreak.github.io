@@ -1,0 +1,28 @@
+name: Build Repo
+on:
+  push:
+    paths:
+      - 'debs/**'
+      - 'Release'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dpkg-dev
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev bzip2
+      - name: Generate Packages
+        run: |
+          dpkg-scanpackages -m ./debs > Packages
+          bzip2 -fks Packages
+          gzip -fks Packages
+      - name: Commit index files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add Packages Packages.bz2 Packages.gz
+          git commit -m "Update Packages" || exit 0
+          git push
+          
